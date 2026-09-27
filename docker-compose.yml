@@ -1,0 +1,45 @@
+services:
+  redis:
+    image: redis:alpine
+    container_name: redis-poc-redispubsubws
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    environment:
+      - REDIS_ARGS=--appendonly yes
+    volumes:
+      - redis-pubsub-ws:/data
+    networks:
+      - redispubsubws-network
+
+  websocket_1:
+    image: image-registry.labs/redis-pubsub-ws:latest
+    container_name: websocket-1-redispubsubws
+    restart: unless-stopped
+    ports:
+      - 5060:5060
+    environment:
+      - PORT=5060
+      - REDIS_URI=redis://redis:6379
+      - SERVER_LABEL=ws-1
+    networks:
+      - redispubsubws-network
+
+  websocket_2:
+    image: image-registry.labs/redis-pubsub-ws:latest
+    container_name: websocket-2-redispubsubws
+    restart: unless-stopped
+    ports:
+      - 5061:5061
+    environment:
+      - PORT=5061
+      - REDIS_URI=redis://redis:6379
+      - SERVER_LABEL=ws-2
+    networks:
+      - redispubsubws-network
+
+networks:
+  redispubsubws-network:
+
+volumes:
+  redis-pubsub-ws:
